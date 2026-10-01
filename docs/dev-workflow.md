@@ -143,6 +143,31 @@ V1 已用（sys_user）。每个模块文档写死自己分到的号段，窗口
 - 新端口要进 CORS 白名单：报给 RIce，由 RIce 改 `application.yml`（共享资产）
 - **尽量同一时间只有一个窗口跑 Flyway 启动**（多窗口同时首启会有迁移锁竞争，能避开就避开）
 
+### 3.8 Maven 构建隔离（**硬性**，2026-10-01 踩坑后补）
+
+多窗口共用同一个 `F:\dyk\personal-os-server`，**`target/` 只有一个**。两个窗口同时 `mvn test/package` 会互相覆盖 class、
+甚至出现 `NoClassDefFoundError: ch/qos/logback/...` 这类假故障；运行中的 `java -jar` 被重新打包后也会当场崩。
+
+**规则**：跑 Maven 前，先复制一份到自己的隔离目录再构建：
+
+```bash
+cd /f/dyk && mkdir -p _build-<你的窗口号> \
+  && tar cf - --exclude=target personal-os-server | (cd _build-<你的窗口号> && tar xf -) \
+  && cd _build-<你的窗口号>/personal-os-server && /d/maven/bin/mvn-bash test
+```
+
+- `_build-*` / `_verify*` / `_pkgtmp` 已在 `.gitignore` 里，**不会进仓**
+- 只有 RIce 在**确认无人跑 Maven** 时，才在正本 `personal-os-server/` 下构建
+- 前端同理：`npm run build` 会写 `dist/`，多窗口同时跑以最后一次为准（可容忍），但别在别人验收截图时跑
+
+### 3.9 文档类共享资产的纪律（2026-10-01 补充）
+
+`docs/**` 是 RIce 的共享资产。窗口若发现**模块文档与实际实现冲突**（例如 M1 发现"done 是终态"与 §5.1 原型
+"图标循环回 todo"矛盾），**正确处理是报告 RIce 裁决，由 RIce 改文档**；直接改文档会导致：
+① 其他窗口读到未裁决的中间态；② RIce 失去文档唯一出口，合并时对不上。
+
+例外：模块文档顶部的 `状态：` 行可由该模块窗口自己从 `draft` → `dev`。
+
 ## 4. 环境速查（零上下文窗口必读）
 
 每次 Bash 调用第一行：`export PATH="/usr/bin:/bin:$PATH"`（本机 PATH 残缺）。

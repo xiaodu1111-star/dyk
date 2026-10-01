@@ -265,9 +265,9 @@ class M0EngineFlowTest {
 
     // ---- 验收 5：首页聚合骨架 -----------------------------------------
 
-    /** /api/dashboard/home 返回契约结构（骨架值）。 */
+    /** /api/dashboard/home 返回契约结构（P1 集成后为真实聚合值）。 */
     @Test
-    void dashboardHomeReturnsSkeletonContract() throws Exception {
+    void dashboardHomeReturnsContractStructure() throws Exception {
         String token = loginAndGetToken();
 
         MvcResult result = mockMvc.perform(get("/api/dashboard/home").header("token", token))
@@ -296,11 +296,12 @@ class M0EngineFlowTest {
         assertEquals(PeriodUtil.formatDate(PeriodUtil.today()), data.path("today").path("date").asText());
         assertEquals(PeriodUtil.dayOfWeekCn(PeriodUtil.today()), data.path("today").path("week").asText());
 
-        // M0 骨架值
-        assertEquals(0, data.path("work").path("todayTotal").asInt());
-        assertEquals(0, data.path("life").path("checkinDone").asInt());
-        assertEquals(0, data.path("streakDays").asInt());
-        assertEquals(0, data.path("sopHints").size());
+        // P1 集成后数值为真实聚合值，此处只断言非负 + 数组形态
+        // （接线正确性由 DashboardIntegrationTest 独立证明）
+        assertTrue(data.path("work").path("todayTotal").asInt() >= 0);
+        assertTrue(data.path("life").path("checkinDone").asInt() >= 0);
+        assertTrue(data.path("streakDays").asInt() >= 0);
+        assertTrue(data.path("sopHints").isArray());
     }
 
     // ---- 通用 ----------------------------------------------------------
