@@ -1,6 +1,6 @@
 # M1 · 工作域（任务）
 
-> 状态：draft · 并行窗口 1（后端 8081 / 前端 5175，需 RIce 把端口加进 CORS 白名单）
+> 状态：**dev** · 并行窗口 1（后端 8081 / 前端 5175，需 RIce 把端口加进 CORS 白名单）
 > **前置必读：`docs/dev-workflow.md`（流程、共享资产清单、git 规则、环境速查）**
 > Flyway 号段：**V10 – V14** · 错误码段：**10000 – 10099** · 已拍板决策：逾期**只标记不顺延**、自然日 00:00 口径
 
@@ -62,6 +62,21 @@ CREATE TABLE work_task (
 | DELETE | `/api/work/tasks/{id}` | — | 逻辑删 |
 
 **状态机**：`todo→doing→done`；`todo/doing→abandoned`；`done`/`abandoned` 终态不可再流转。完成时写 `done_at`，并调用 `ActivityLogService.log(dimension="work", bizType="task_done", title=任务标题, occurredAt=now)`。
+
+**迁移合法性最终表（实现依据，2026-10-01 落地时以 §5.1 过审原型为准裁决）**：
+
+| 起点 | 允许迁移到 | 说明 |
+|---|---|---|
+| `todo` | `doing` / `done` / `abandoned` | — |
+| `doing` | `todo` / `done` / `abandoned` | 允许回退到 todo（点图标循环） |
+| `done` | `todo` | **允许「重新打开」**，前端二次确认后触发；回退时**必须清空 `done_at`**，且不写活动流 |
+| `abandoned` | — | **严格终态，不可逆** |
+
+- 同状态重复设置（如 `todo→todo`）：**幂等返回成功**，不写库、不报错。
+- `done_at` 与活动流：**仅当「首次进入 done」（target=done 且 current≠done）** 时写 `done_at` + 一条 `work/task_done` 活动流。
+- 上文「终态不可再流转」应理解为 **`abandoned` 严格终态**；`done` 允许在二次确认后重开（§5.1 原型规格为小杜过审的硬规格）。
+- **`view` 参数非法或缺失一律兜底为 `all`**，不报 10003（容错优先）。
+- 分页：`page` 默认 1 最小 1；`size` 默认 20 上限 100。
 
 **三视图口径（用 M0 的 `PeriodUtil`，禁自己算日期）**：
 - `today`：未完成 且（`due_at` 为空 或 `due_at` >= 今日 00:00）——**不含逾期**（逾期不自动进今日，小杜拍板）
