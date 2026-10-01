@@ -26,6 +26,31 @@
 
 ---
 
+## 0.5 落地修订记录（P0 实施后，2026-10-01 · RIce）
+
+> P0 登录闭环已实施。以下为**实际落地与本文原稿的偏差**，遇到冲突时**以本节为准**。原因分两类：本机环境约束（JDK 24）、QA 修复。
+
+| # | 项 | 原稿 | 实际落地 | 原因 |
+|---|---|---|---|---|
+| 1 | Spring Boot | 3.2.5 | **3.5.16** | 本机仅有 JDK 24（无 17/21），Boot 3.2.x 不支持 |
+| 2 | MyBatis-Plus | 3.5.7 | **3.5.17** + 显式补 `mybatis-plus-jsqlparser` | 版本对齐；3.5.9+ 把 JSqlParser 拆出 starter |
+| 3 | Hutool | 5.8.27 | 5.8.47 | 随 Boot 3.5 上调 |
+| 4 | MapStruct | 引入 | **不引入** | JDK 24 注解处理器风险大 + P0 用不上；转换用 Hutool BeanUtil / 手写 |
+| 5 | Knife4j | 4.5.0 | 保留，但**显式锁 `springdoc-openapi-starter-webmvc-ui:2.8.6`** | Knife4j 传递的 springdoc 低于 Boot 3.5 要求 |
+| 6 | Sa-Token 会话 | Redis（sa-token-redis-jackson） | **内存会话**（P1 已定继续不引 Redis） | 本机无 Redis；番茄钟推 P2 时再定 |
+| 7 | 编译 | JDK 17 | `maven.compiler.release=17`，**JDK 24 编译器**；`annotationProcessorPaths` 显式挂 Lombok + `-proc:full` | JDK 23+ javac 不再自动跑 classpath 注解处理器 |
+| 8 | Flyway 范围 | V1–V4 | P0 仅 **V1__init_sys_user.sql**；V2–V4（引擎表）推迟到 P1 M0 | P0 只做登录 |
+| 9 | 种子账号 | — | `DataInitializer`（ApplicationRunner，表空播种，BCrypt 现算），**不进 Flyway** | 迁移与数据分离 |
+| 10 | CORS | — | **显式白名单** `personal-os.cors.allowed-origins` + `setAllowedOrigins` | QA 实测 `addAllowedOriginPattern("*")` + credentials 会回显任意 Origin，安全漏洞已修 |
+| 11 | 错误码扩展 | ErrorCode 统一枚举 | ErrorCode 保持枚举；**模块错误码用各自包内枚举 + `BizException(int, String)`**（P1 并行约定，见 dev-workflow.md） | 零侵入，避免多窗口改共享文件 |
+| 12 | §4.8 首页 Redis 缓存 | Cache-Aside + TTL | **未实施**（无 Redis），首页聚合暂直查 DB | P1 数据量小，直查够用；引入 Redis 时补 |
+| 13 | §8 定时任务 | P0 末尾实现 | **推迟**（P1 不做，原稿本就建议延后） | — |
+| 14 | 畸形 JSON | — | `GlobalExceptionHandler` 补 `HttpMessageNotReadableException` → 400 | QA 第 1 轮抓出 |
+
+P1 补充约定（2026-10-01 小杜拍板）：时间口径**自然日 00:00**（PeriodUtil 唯一来源）；任务逾期**只标记不顺延**。
+
+---
+
 ## 1. 请求全链路
 
 ### 1.1 组件流水线
