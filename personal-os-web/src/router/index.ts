@@ -25,6 +25,24 @@ const routes: RouteRecordRaw[] = [
         name: 'Home',
         component: () => import('@/views/home/Home.vue'),
         meta: { title: '首页' }
+      },
+      {
+        path: 'work',
+        name: 'Work',
+        component: () => import('@/views/work/index.vue'),
+        meta: { title: '工作' }
+      },
+      {
+        path: 'sop',
+        name: 'Sop',
+        component: () => import('@/views/sop/index.vue'),
+        meta: { title: 'SOP 清单' }
+      },
+      {
+        path: 'life',
+        name: 'Life',
+        component: () => import('@/views/life/index.vue'),
+        meta: { title: '生活' }
       }
     ]
   },
