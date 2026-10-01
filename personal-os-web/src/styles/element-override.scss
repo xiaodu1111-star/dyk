@@ -1,0 +1,111 @@
+// =============================================================
+// Personal OS · Element Plus 玻璃化覆盖
+// 保留 EP 依赖（后续管理页要用），仅把变量与全局反馈组件对齐液态玻璃。
+// 登录 / 主页不使用 EP 的默认视觉。
+// =============================================================
+
+:root {
+  --el-color-primary: var(--accent);
+  --el-color-danger: var(--danger);
+  --el-color-success: var(--success);
+  --el-font-family: var(--font-sans);
+  --el-border-radius-base: var(--r-sm);
+}
+
+html[data-theme='dark'] {
+  --el-color-primary: var(--accent);
+  /* 不再用 transparent：给 EP 一个合理的深色半透明表面，
+     否则默认（取消）按钮会回退到 EP 浅色调色板的白色底，深色下文字不可读 */
+  --el-bg-color: var(--glass-bg-thick);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-secondary);
+}
+
+/* ---- ElMessage ---- */
+.el-message {
+  padding: 12px 18px;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--r-md) !important;
+  background: var(--glass-bg-thick) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--glass-shadow), var(--glass-inner) !important;
+}
+
+.el-message .el-message__content {
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans);
+}
+
+.el-message--error .el-message__icon {
+  color: var(--danger);
+}
+
+/* ---- ElMessageBox ---- */
+.el-overlay {
+  background-color: rgba(0, 0, 0, 0.28) !important;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.el-message-box {
+  padding: 22px;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--r-lg) !important;
+  background: var(--glass-bg-thick) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  /* 弹窗单独用更轻的一档阴影，避免深色下糊成一块深色矩形 */
+  box-shadow: var(--glass-shadow-dialog), var(--glass-inner) !important;
+}
+
+.el-message-box .el-message-box__title {
+  color: var(--text-primary);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.el-message-box .el-message-box__message p {
+  color: var(--text-secondary);
+}
+
+/* 弹窗按钮：全部胶囊化；主按钮走 accent，非主（取消）按钮显式走玻璃 —— 明暗两套都保证文字可读 */
+.el-message-box .el-message-box__btns .el-button {
+  height: 38px;
+  padding: 0 20px;
+  font-weight: 500;
+  border-radius: var(--r-pill);
+  transition: background-color var(--dur) var(--spring), border-color var(--dur) var(--spring),
+    color var(--dur) var(--spring);
+}
+
+/* 取消等非主按钮：不依赖 EP 的浅色默认底，改为玻璃底 + 亮边 + 主文字色 */
+.el-message-box .el-message-box__btns .el-button:not(.el-button--primary) {
+  color: var(--text-primary);
+  background: var(--glass-bg-thin);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+.el-message-box .el-message-box__btns .el-button:not(.el-button--primary):hover {
+  color: var(--text-primary);
+  background: var(--glass-bg-thick);
+  border-color: var(--glass-border);
+}
+
+.el-message-box .el-message-box__btns .el-button:not(.el-button--primary):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.el-message-box .el-message-box__btns .el-button--primary {
+  border-color: transparent;
+  background: var(--accent);
+  color: #fff;
+}
+
+.el-message-box .el-message-box__btns .el-button--primary:hover {
+  background: var(--accent-press);
+  border-color: transparent;
+}

@@ -1,0 +1,110 @@
+// =============================================================
+// Personal OS · 设计 token（iOS 26 Liquid Glass）
+// 仅声明 CSS 自定义属性，不产出视觉规则；明暗两套值在此切换。
+// 详见 docs/ui-design-system.md
+// =============================================================
+
+:root {
+  color-scheme: light;
+
+  /* ---- 字体栈（系统字体，不引外部 CDN） ---- */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+    'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+
+  /* ---- 颜色（浅色） ---- */
+  --accent: #007aff;
+  --accent-press: #0062cc;
+  --danger: #ff3b30;
+  --success: #34c759;
+
+  --text-primary: rgba(0, 0, 0, 0.92);
+  --text-secondary: rgba(60, 60, 67, 0.62);
+  --text-tertiary: rgba(60, 60, 67, 0.34);
+  --separator: rgba(60, 60, 67, 0.14);
+
+  /* ---- 玻璃配方（浅色） ---- */
+  /* 更狠的模糊 + 更高饱和：让壁纸的蓝紫真正透过玻璃 */
+  --glass-blur: 34px;
+  --glass-saturate: 200%;
+
+  --glass-bg-thin: rgba(255, 255, 255, 0.26);
+  --glass-bg: rgba(255, 255, 255, 0.44);
+  --glass-bg-thick: rgba(255, 255, 255, 0.58);
+
+  --glass-border: rgba(255, 255, 255, 0.72);
+  /* 贴近的柔和投影（不再是大范围 Material 式扩散） */
+  --glass-shadow: 0 6px 24px rgba(17, 24, 39, 0.1), 0 1px 2px rgba(17, 24, 39, 0.04);
+  /* 弹窗专用：比常规玻璃再轻一点，保持浮起的轻盈感、不发灰 */
+  --glass-shadow-dialog: 0 10px 30px rgba(17, 24, 39, 0.12), 0 1px 2px rgba(17, 24, 39, 0.04);
+  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+
+  /* ---- 玻璃镜面高光 / 液面折射（浅色） ---- */
+  /* 左上光源在玻璃表面形成的椭圆高光斑，作为 ::before 的顶层图层 */
+  --glass-spec-radial: radial-gradient(
+    120% 80% at 18% -10%,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.14) 34%,
+    rgba(255, 255, 255, 0) 62%
+  );
+  --glass-hi-top: rgba(255, 255, 255, 0.52);
+  --glass-hi-mid: rgba(255, 255, 255, 0.1);
+  --glass-edge: inset 0 0 0 0.5px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+
+  /* ---- 圆角阶梯（连续曲率近似） ---- */
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 26px;
+  --r-xl: 34px;
+  --r-pill: 999px;
+
+  /* ---- 运动曲线 ---- */
+  --spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 160ms;
+  --dur: 260ms;
+  --dur-slow: 420ms;
+
+  /* ---- 壁纸底色 ---- */
+  --page-base: #eef3fa;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* ---- 颜色（深色） ---- */
+  --accent: #0a84ff;
+  --accent-press: #0a6fd6;
+  --danger: #ff453a;
+  --success: #30d158;
+
+  --text-primary: rgba(255, 255, 255, 0.94);
+  --text-secondary: rgba(235, 235, 245, 0.62);
+  --text-tertiary: rgba(235, 235, 245, 0.34);
+  --separator: rgba(84, 84, 88, 0.5);
+
+  /* ---- 玻璃配方（深色） ---- */
+  --glass-bg-thin: rgba(44, 44, 50, 0.3);
+  --glass-bg: rgba(42, 42, 48, 0.44);
+  --glass-bg-thick: rgba(40, 40, 46, 0.56);
+
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 6px 24px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.22);
+  /* 弹窗专用：深色下大幅收敛，避免糊成一块深色矩形 */
+  --glass-shadow-dialog: 0 10px 30px rgba(0, 0, 0, 0.26), 0 1px 2px rgba(0, 0, 0, 0.14);
+  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* 深色下压暗液面折射与镜面高光，避免"奶白糊顶" */
+  --glass-spec-radial: radial-gradient(
+    120% 80% at 18% -10%,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.03) 34%,
+    rgba(255, 255, 255, 0) 62%
+  );
+  --glass-hi-top: rgba(255, 255, 255, 0.16);
+  --glass-hi-mid: rgba(255, 255, 255, 0.05);
+  --glass-edge: inset 0 0 0 0.5px rgba(255, 255, 255, 0.16),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.35);
+
+  /* ---- 壁纸底色 ---- */
+  --page-base: #0b1020;
+}

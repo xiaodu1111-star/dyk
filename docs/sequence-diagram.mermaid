@@ -1,0 +1,30 @@
+sequenceDiagram
+    autonumber
+    participant C as Client 前端
+    participant F as Filter链 CORS/SaToken
+    participant I as SaInterceptor
+    participant Ct as WorkTaskController
+    participant S as WorkTaskService
+    participant M as TaskMapper MP
+    participant A as ActivityStreamService
+    participant DB as MySQL
+    participant R as Redis
+
+    C->>F: PATCH /api/work/tasks/1/status  header: token
+    F->>I: preHandle 校验登录与注解权限
+    I-->>F: 校验通过
+    F->>Ct: 进入 Controller
+    Ct->>Ct: @Valid 校验 StatusCmd
+    Ct->>S: updateStatus(id=1, DONE)
+    S->>S: @Transactional 开启事务
+    S->>M: selectById(1) 逻辑删除自动过滤
+    M->>DB: SELECT ... WHERE id=1 AND deleted=0
+    DB-->>M: 行数据
+    S->>M: update status=done, done_at=now 自动填充 update_time
+    M->>DB: UPDATE work_task ...
+    S->>A: log(ActivityLog task_done)
+    A->>DB: INSERT act_activity_log
+    S->>R: DEL home:1:2026-10-01
+    S-->>Ct: TaskVO (MapStruct)
+    Ct-->>C: R<TaskVO> 事务提交
+    Note over S,DB: 任一步抛异常 → 事务回滚 → GlobalExceptionHandler 兜住

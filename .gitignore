@@ -1,0 +1,35 @@
+# ---- 构建产物 ----
+personal-os-server/target/
+personal-os-web/node_modules/
+personal-os-web/dist/
+personal-os-web/*.local
+
+# ---- 日志 ----
+*.log
+logs/
+
+# ---- IDE ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- 本地敏感配置（不要提交真实密码） ----
+*.env
+.env.local
+
+# ---- WorkBuddy 会话数据（本地工作档案，不入库） ----
+.workbuddy/
+
+# ---- 临时工作文件（截图、调试脚本、回退备份） ----
+shot-*.png
+_*.txt
+_*.log
+_*.mjs
+_revert/

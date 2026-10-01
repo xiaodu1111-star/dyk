@@ -1,0 +1,120 @@
+classDiagram
+    direction LR
+
+    class R~T~ {
+        +int code
+        +String msg
+        +T data
+        +ok(T) R~T~
+        +ok() R~T~
+        +fail(int, String) R~T~
+        +fail(String) R~T~
+    }
+    class PageResult~T~ {
+        +List~T~ records
+        +long total
+        +long page
+        +long size
+        +of(IPage~T~) PageResult~T~
+    }
+    class BizException {
+        +int code
+        +getCode() int
+    }
+
+    class MetricEngineService {
+        <<interface>>
+        +define(MetricDefDTO) Long
+        +updateDef(Long, MetricDefDTO) void
+        +removeDef(Long) void
+        +listDefs(String dimension) List~MetricDefVO~
+        +record(RecordCmd) MetricRecordVO
+        +trend(String code, LocalDate start, LocalDate end) List~MetricTrendVO~
+        +todaySummary(List~String~ codes) Map~String,MetricTodayVO~
+        +aggregate(String code, LocalDate start, LocalDate end, String aggType) BigDecimal
+    }
+    class ActivityStreamService {
+        <<interface>>
+        +log(ActivityLog log) Long
+        +log(LogActivityDTO dto) void
+        +timeline(LocalDate date, String dimension, int limit) List~ActivityVO~
+        +crossDimensionStat(LocalDate start, LocalDate end) List~DimStatVO~
+        +archiveBefore(LocalDate before) int
+        +evictHomeCache(Long userId, LocalDate date) void
+    }
+    class TagService {
+        <<interface>>
+        +create(TagDTO) Long
+        +update(Long, TagDTO) void
+        +delete(Long) void
+        +list(String scope, String keyword) List~TagVO~
+        +bindTags(List~Long~ tagIds, String bizType, Long bizId) void
+        +tagsOf(String bizType, Long bizId) List~Tag~
+        +loadTags(Collection~Long~ bizIds, String bizType) Map~Long,List~Tag~~
+        +hotTags(int limit) List~Tag~
+    }
+
+    class ActivityLog {
+        +Long id
+        +Long userId
+        +String dimension
+        +String bizType
+        +String title
+        +Integer durationMin
+        +BigDecimal valueNum
+        +String refType
+        +Long refId
+        +LocalDateTime occurredAt
+        +LocalDate activityDate
+    }
+    class MetricDef {
+        +Long id
+        +String code
+        +String dimension
+        +String valueType
+        +String aggType
+        +BigDecimal targetValue
+    }
+    class MetricRecord {
+        +Long id
+        +Long metricId
+        +LocalDate recordDate
+        +BigDecimal valueNum
+        +String refType
+        +Long refId
+    }
+    class Tag {
+        +Long id
+        +String name
+        +String scope
+        +Integer useCount
+    }
+    class TagRel {
+        +Long tagId
+        +String bizType
+        +Long bizId
+    }
+
+    class WorkTaskService
+    class FitWorkoutService
+    class LifeHabitService
+    class FinanceTxService
+    class LearnSessionService
+
+    MetricEngineService ..> MetricDef : 读定义
+    MetricEngineService ..> MetricRecord : 写记录
+    TagService ..> Tag : 管理
+    TagService ..> TagRel : 多态关联
+    ActivityStreamService ..> ActivityLog : 写入/查询
+
+    WorkTaskService ..> ActivityStreamService : 完成时 log
+    WorkTaskService ..> TagService : bindTags
+    FitWorkoutService ..> ActivityStreamService : log
+    FitWorkoutService ..> MetricEngineService : 体重等指标
+    LifeHabitService ..> ActivityStreamService : 打卡 log
+    FinanceTxService ..> ActivityStreamService : 记账 log
+    FinanceTxService ..> TagService : bindTags
+    LearnSessionService ..> ActivityStreamService : log
+    LearnSessionService ..> MetricEngineService : 学习时长
+
+    R ..> BizException : 错误码

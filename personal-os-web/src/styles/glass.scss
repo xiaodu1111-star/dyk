@@ -1,0 +1,91 @@
+// =============================================================
+// Personal OS · 液态玻璃基类与 mixin
+// 三层质感：backdrop 模糊取色 → ::before 顶部镜面高光 → ::after 边缘折射（厚度感）
+// =============================================================
+
+/// 液态玻璃表面。
+/// @param {Color} $bg - 玻璃底色，默认 --glass-bg（标准层）
+@mixin glass-surface($bg: var(--glass-bg)) {
+  position: relative;
+  isolation: isolate;
+  background: $bg;
+
+  // 两个都要写：Safari 需要 -webkit- 前缀
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-inner);
+
+  // 液面高光：顶层为左上光源的椭圆光斑（radial），下层为纵向镜面渐变（linear）
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      var(--glass-spec-radial),
+      linear-gradient(
+        180deg,
+        var(--glass-hi-top) 0%,
+        var(--glass-hi-mid) 34%,
+        rgba(255, 255, 255, 0) 62%
+      );
+  }
+
+  // 边缘折射 + 底部极淡暗边：制造"玻璃有厚度"的错觉
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow: var(--glass-edge);
+  }
+}
+
+/// 可按压交互：轻微缩放 + spring 过渡。仅在允许动效时生效。
+@mixin pressable {
+  transition: transform var(--dur-fast) var(--spring),
+    background-color var(--dur) var(--spring), box-shadow var(--dur) var(--spring),
+    color var(--dur) var(--spring), border-color var(--dur) var(--spring);
+
+  @media (prefers-reduced-motion: no-preference) {
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+}
+
+/// 进场上浮动画。
+@mixin enter-rise($distance: 12px, $delay: 0ms) {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: po-enter-rise var(--dur-slow) var(--spring) both;
+    animation-delay: $delay;
+  }
+}
+
+@keyframes po-enter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 三个厚度层级 */
+.glass {
+  @include glass-surface(var(--glass-bg));
+}
+
+.glass--thin {
+  @include glass-surface(var(--glass-bg-thin));
+}
+
+.glass--thick {
+  @include glass-surface(var(--glass-bg-thick));
+}

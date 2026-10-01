@@ -1,0 +1,10 @@
+# 本地开发环境专用配置
+logging:
+  level:
+    root: info
+    com.xiaodu.personalos: debug
+
+# 开发期打印 SQL，便于验证
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
