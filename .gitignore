@@ -37,3 +37,6 @@ _revert/
 _verify*/
 _pkgtmp/
 _jdto/
+_build-*/
+_qa/
+_run/
