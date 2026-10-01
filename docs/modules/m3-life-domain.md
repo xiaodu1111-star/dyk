@@ -48,6 +48,10 @@
 | POST | `/api/life/quick-record` | `{ text }` | 解析 `{ metricId, metricName, value, date }` **只解析不落库**；解析不了 → 14003 |
 | POST | `/api/life/records` | `{ metricId, value, date? }` | 确认后落库（快捷记录与手动的统一入口） |
 
+> **快捷记录口径（主设计师自验确认，2026-10-01）**：`text` 里的习惯名**必须是已定义的习惯**（落在 `sys_metric_def`，dimension=life）才解析得出，
+> 例如已有习惯「喝水」时输入「喝水 2」→ 返回 `{metricId:77, metricName:"喝水", value:2}`；输入「俯卧撑 20」而库里没有该习惯 → **14003**。
+> 这是刻意的防乱建指标设计（不做自动建习惯）。若以后要支持"边记边建"，属 P2 增强，不在本期。
+
 **streak 算法**（自然日 00:00 口径，用 `PeriodUtil`）：
 - 打卡型：从今天（或昨天，若今天未打）向前逐日查 `value_num >= 1`，连续计数
 - 计数型：`SUM(value) > 0` 视为当日有效
