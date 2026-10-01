@@ -11,12 +11,6 @@ const data = ref<DashboardData | null>(null)
 const loading = ref(true)
 const failed = ref(false)
 
-/** 进度百分比（0-100），分母为 0 时返回 0 */
-function percent(done: number, total: number): number {
-  if (!total || total <= 0) return 0
-  return Math.min(100, Math.round((done / total) * 100))
-}
-
 async function load(): Promise<void> {
   loading.value = true
   failed.value = false
@@ -69,13 +63,11 @@ onMounted(() => {
             逾期 {{ data.work.overdue }}
           </span>
         </header>
+        <!-- 口径说明：待办 = 今日视图未完成数；今日完成 = 今天完成过的任务数（两者不同源，不做分数） -->
         <p class="metric">
-          <span class="metric__value">{{ data?.work.todayDone ?? 0 }}</span>
-          <span class="metric__unit">/ {{ data?.work.todayTotal ?? 0 }} 今日任务</span>
+          <span class="metric__value">{{ data?.work.todayTotal ?? 0 }}</span>
+          <span class="metric__unit">项待办 · 今日完成 {{ data?.work.todayDone ?? 0 }}</span>
         </p>
-        <div class="bar" aria-hidden="true">
-          <i class="bar__fill" :style="{ width: percent(data?.work.todayDone ?? 0, data?.work.todayTotal ?? 0) + '%' }" />
-        </div>
         <p class="card__foot">点击进入工作台 →</p>
       </section>
 
@@ -296,20 +288,6 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
-.bar {
-  height: 5px;
-  overflow: hidden;
-  background: var(--separator);
-  border-radius: var(--r-pill);
-}
-
-.bar__fill {
-  display: block;
-  height: 100%;
-  background: var(--accent);
-  border-radius: inherit;
-  transition: width var(--dur-slow) var(--spring);
-}
 
 .dots {
   display: flex;

@@ -1,6 +1,6 @@
 # M3 · 生活域（习惯打卡 + 快捷记录）
 
-> 状态：draft · 并行窗口 3（后端 8083 / 前端 5177，需 RIce 把端口加进 CORS 白名单）
+> 状态：dev · 并行窗口 3（后端 8083 / 前端 5177）
 > **前置必读：`docs/dev-workflow.md`（流程、共享资产清单、git 规则、环境速查）**
 > Flyway 号段：**V50 – V59** · 错误码段：**14000 – 14099**
 > **依赖**：M0 指标引擎（`sys_metric_def` / `sys_metric_record` + `MetricService`）已就位；**不建业务专表**（`life_habit` 等表不用，这是总设计的落地验证）

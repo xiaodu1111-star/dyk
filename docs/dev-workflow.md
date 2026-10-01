@@ -172,6 +172,10 @@ cd /f/dyk && mkdir -p _build-<你的窗口号> \
 
 每次 Bash 调用第一行：`export PATH="/usr/bin:/bin:$PATH"`（本机 PATH 残缺）。
 
+**时间字段契约（2026-10-01 踩坑确认）**：全局 `spring.jackson.date-format: yyyy-MM-dd HH:mm:ss`，
+**请求体里的 LocalDateTime 一律用 `yyyy-MM-dd HH:mm:ss`（空格分隔）**，发 ISO 的 `T` 格式（`2026-09-30T10:00:00`）会直接 400「请求体格式错误」。
+前端统一 `dayjs(x).format('YYYY-MM-DD HH:mm:ss')`，见 `WorkQuickAdd.vue` 等参照实现。
+
 | 项 | 值 / 用法 |
 |---|---|
 | JDK | `export JAVA_HOME='C:\Users\Lenovo\.jdks\temurin-24'`。**默认 java 是 1.8，跑不了本项目** |
